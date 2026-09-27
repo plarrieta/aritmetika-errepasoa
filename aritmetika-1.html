@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ARITMETIKA 1 · Errepaso interaktiboa · v3</title>
+<title>ARITMETIKA 1 · Errepaso interaktiboa · v4</title>
 <style>
   :root{
     --bg:#eef2f4; --paper:#fff; --ink:#1f2937; --muted:#667085; --line:#d7dde3;
@@ -762,6 +762,7 @@
         classifySelects.map(sel => [sel.dataset.qid, sel.value])
       )
     };
+    data.submitted = false;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     if(show){ setStatus("Gordeta ✓"); setTimeout(()=>setStatus("Prest"), 1500); }
   }
@@ -770,6 +771,15 @@
     if(!raw) return;
     try{
       const data = JSON.parse(raw);
+
+      if(data.submitted === true){
+        localStorage.removeItem(STORAGE_KEY);
+        studentEl.value = "";
+        groupEl.value = "DBH4DC";
+        setStatus("Prest");
+        return;
+      }
+
       studentEl.value = data.student || "";
       groupEl.value = data.group || "DBH4DC";
       factorBuilders.forEach(builder => {
@@ -839,6 +849,13 @@
       alert("Zure lana irakasleari bidali zaio.");
       const sentBanner = document.getElementById("sentBanner");
       if(sentBanner) sentBanner.style.display = "block";
+
+      try{
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+        saved.submitted = true;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+      }catch(e){}
+
       setTimeout(()=>setStatus("Prest"), 1800);
 
     }catch(err){
