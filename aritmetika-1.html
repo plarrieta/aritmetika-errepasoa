@@ -4,7 +4,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ARITMETIKA 1 · Errepaso interaktiboa · v4</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>ARITMETIKA 1 · Errepaso interaktiboa · v5</title>
 <style>
   :root{
     --bg:#eef2f4; --paper:#fff; --ink:#1f2937; --muted:#667085; --line:#d7dde3;
@@ -503,7 +506,7 @@
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
 (() => {
-  const STORAGE_KEY = "aritmetika1_azkena_v2";
+  const STORAGE_KEY = "aritmetika1_session_v5";
   const WEBAPP_URL = "https://script.google.com/a/macros/hernanibhi.com/s/AKfycbynVcfKX7uCCP59cLmFoMjiuK6uHemVGCvj2S1ioAVQYDbh_TfIVvgGG1uRwtvUBzxpyA/exec";
   const statusEl = document.getElementById("status");
   const studentEl = document.getElementById("student");
@@ -763,17 +766,17 @@
       )
     };
     data.submitted = false;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     if(show){ setStatus("Gordeta ✓"); setTimeout(()=>setStatus("Prest"), 1500); }
   }
   function restoreState(){
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = sessionStorage.getItem(STORAGE_KEY);
     if(!raw) return;
     try{
       const data = JSON.parse(raw);
 
       if(data.submitted === true){
-        localStorage.removeItem(STORAGE_KEY);
+        sessionStorage.removeItem(STORAGE_KEY);
         studentEl.value = "";
         groupEl.value = "DBH4DC";
         setStatus("Prest");
@@ -819,18 +822,37 @@
     if(sentBanner) sentBanner.style.display = "none";
     setStatus("Aldaketak gordetzeke");
   }
+  let sendArmed = false;
+  let sendTimer = null;
+
   async function sendToTeacher(){
+    const btn = document.getElementById("sendBtn");
+
     if(!studentEl.value.trim()){
       alert("Mesedez, idatzi lehenengo ikaslearen izen-abizenak.");
       studentEl.focus();
       return;
     }
 
-    const confirmed = confirm(
-      "Zure emaitzak irakasleari bidali nahi dizkiozu?\n\n" +
-      "Bidalketa bakoitza saiakera berri gisa gordeko da."
-    );
-    if(!confirmed) return;
+    // First click = arm the send. This avoids confirm() dialogs,
+    // which can be blocked inside a Google Sites iframe.
+    if(!sendArmed){
+      sendArmed = true;
+      btn.textContent = "ZIUR? BIDALI BERRIRO";
+      setStatus("Bidaltzeko, sakatu berriro");
+
+      sendTimer = setTimeout(() => {
+        sendArmed = false;
+        btn.textContent = "BIDALI IRAKASLEARI";
+        setStatus("Prest");
+      }, 4500);
+
+      return;
+    }
+
+    clearTimeout(sendTimer);
+    sendArmed = false;
+    btn.textContent = "BIDALI IRAKASLEARI";
 
     const payload = buildPayload();
     saveLocal(false);
@@ -846,21 +868,28 @@
       });
 
       setStatus("Bidalketa eginda ✓");
-      alert("Zure lana irakasleari bidali zaio.");
+
       const sentBanner = document.getElementById("sentBanner");
       if(sentBanner) sentBanner.style.display = "block";
 
+      // Mark this session as submitted. If the page is reopened in the same
+      // tab, previous student data will not be restored.
       try{
-        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+        const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "{}");
         saved.submitted = true;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
       }catch(e){}
 
-      setTimeout(()=>setStatus("Prest"), 1800);
+      btn.textContent = "BIDALITA ✓";
+      setTimeout(() => {
+        btn.textContent = "BIDALI IRAKASLEARI";
+        setStatus("Prest");
+      }, 2200);
 
     }catch(err){
       console.error(err);
       setStatus("Bidalketa errorea");
+      btn.textContent = "BIDALI IRAKASLEARI";
       alert("Ezin izan da lana bidali. Egiaztatu Internet konexioa eta saiatu berriro.");
     }
   }
@@ -937,7 +966,7 @@
     clearArmed = false;
     btn.textContent = "GARBITU";
 
-    localStorage.removeItem(STORAGE_KEY);
+    sessionStorage.removeItem(STORAGE_KEY);
     studentEl.value = "";
     groupEl.value = "DBH4DC";
 
