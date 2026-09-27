@@ -1,0 +1,966 @@
+
+<!DOCTYPE html>
+<html lang="eu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARITMETIKA 1 · Errepaso interaktiboa · v3</title>
+<style>
+  :root{
+    --bg:#eef2f4; --paper:#fff; --ink:#1f2937; --muted:#667085; --line:#d7dde3;
+    --accent:#e49b18; --accent-dark:#9b6200; --ok:#137a3a; --ok-bg:#effcf3;
+    --bad:#b42318; --bad-bg:#fff3f2; --soft:#f8fafb;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:var(--bg)}
+  .toolbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center;padding:10px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+  button{border:1px solid #b9c2cc;background:#fff;color:var(--ink);border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
+  button:hover{background:#f7f8f9}
+  .primary{background:#20262d;color:#fff;border-color:#20262d}
+  .primary:hover{background:#343b43}
+  .accent{background:#fff8ec;border-color:#efcf96;color:#7a4f00}
+  .danger{color:var(--bad)}
+  .status{min-width:160px;text-align:center;color:var(--muted);font-size:.9rem}
+  .sheet{width:min(980px, calc(100% - 20px));margin:22px auto 40px;background:var(--paper);box-shadow:0 4px 18px rgba(0,0,0,.08);padding:28px 32px 36px}
+  .head{display:grid;grid-template-columns:220px 1fr;border:1.5px solid #30363b;min-height:130px}
+  .head-left{border-right:1.5px solid #30363b;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:16px}
+  .bar{width:74px;height:10px;background:var(--accent);margin-bottom:10px}
+  .head-left strong{font-size:1.35rem;letter-spacing:.04em}
+  .head-left span{margin-top:6px}
+  .head-right{padding:14px 18px;display:grid;grid-template-rows:auto 1fr auto}
+  .course{text-align:right;font-size:.95rem}
+  h1{margin:10px 0 4px;text-align:right;font-size:1.95rem;letter-spacing:.05em}
+  .meta{display:grid;grid-template-columns:1fr 170px 140px;gap:8px}
+  .field{display:flex;align-items:center;gap:8px;border:1px solid #737b84;padding:6px 8px;min-height:38px}
+  .field label{white-space:nowrap;font-size:.93rem}
+  .field input{border:0;outline:none;width:100%;min-width:0;font-size:1rem;padding:4px 2px;background:transparent}
+  .scorebox{display:flex;align-items:center;justify-content:center;border:1px solid #737b84;font-weight:700;min-height:38px}
+  .info{margin:18px 0 6px;border-left:4px solid var(--accent);background:#fffaf0;color:#5c4a27;padding:10px 12px;font-size:.93rem}
+  .exercise{display:grid;grid-template-columns:48px 1fr;gap:14px;padding:20px 0 24px;border-bottom:1px solid #edf1f4}
+  .num{width:40px;height:40px;border:1.5px solid #47505a;display:flex;align-items:center;justify-content:center;font-weight:700}
+  .title{margin:0 0 10px;font-size:1rem;font-weight:700}
+  .subtext{color:var(--muted);font-size:.9rem;margin:-3px 0 12px}
+  .grid2,.grid3{display:grid;gap:12px}
+  .grid2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grid3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .card{border:1px solid var(--line);background:var(--soft);border-radius:12px;padding:12px}
+  .prompt{margin:0 0 8px}
+  .expr{font-family:"Cambria Math","Times New Roman",serif;font-size:1.05rem}
+  .answer{border:1.5px solid #98a2ad;border-radius:7px;min-height:38px;padding:7px 10px;width:150px;font-size:1rem;background:#fff}
+  .answer:focus{outline:2px solid rgba(228,155,24,.2);border-color:var(--accent-dark)}
+  .answer.correct{border-color:var(--ok);background:var(--ok-bg)}
+  .answer.wrong{border-color:var(--bad);background:var(--bad-bg)}
+  .feedback{display:inline-block;min-width:24px;margin-left:8px;font-weight:800}
+  .feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+  .chip{border:1px solid #c9d1d9;background:#fff;border-radius:999px;padding:8px 12px;cursor:pointer;font-weight:700}
+  .chip.active{background:#fff1d6;border-color:#f0c26d;color:#7a5200}
+  .chip{position:relative;min-width:48px}
+  .chip .count{display:none;position:absolute;top:-8px;right:-8px;min-width:22px;height:22px;line-height:20px;text-align:center;border-radius:999px;background:#20262d;color:#fff;font-size:.75rem;border:2px solid #fff}
+  .chip.has-count .count{display:block}
+  .factor-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .factor-actions button{padding:7px 10px;font-size:.84rem}
+  .build{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px;border:1px dashed #c7cdd4;background:#fff;border-radius:10px;min-height:54px}
+  .build .mini{background:#f8f2e2;border:1px solid #ebcd8b;border-radius:999px;padding:5px 10px;font-weight:700}
+  .build .placeholder{color:#98a2ad}
+  .choices{display:grid;gap:8px}
+  .choice{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 12px;display:flex;gap:8px;align-items:flex-start}
+  .classify-list{display:grid;gap:10px}
+  .classify-row{
+    display:grid;
+    grid-template-columns:minmax(150px,1fr) minmax(220px,1.4fr) 34px;
+    gap:12px;
+    align-items:center;
+    border:1px solid var(--line);
+    background:#fff;
+    border-radius:10px;
+    padding:10px 12px;
+  }
+  .classify-number{
+    font-family:"Cambria Math","Times New Roman",serif;
+    font-size:1.08rem;
+    font-weight:700;
+  }
+  .classify-select{
+    width:100%;
+    min-height:38px;
+    border:1.5px solid #98a2ad;
+    border-radius:7px;
+    padding:7px 9px;
+    font-size:.95rem;
+    background:#fff;
+  }
+  .classify-select.correct{border-color:var(--ok);background:var(--ok-bg)}
+  .classify-select.wrong{border-color:var(--bad);background:var(--bad-bg)}
+
+  .sortable{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff}
+  .sort-item{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border:1px solid #e2e8ef;border-radius:10px;padding:10px;margin:8px 0;background:#fbfcfd}
+  .sort-controls button{padding:6px 8px;min-width:36px;border-radius:8px}
+  .sort-item[draggable="true"]{cursor:grab}
+  .sort-item.dragging{opacity:.45;border-style:dashed}
+  .sort-item.drag-over{border-color:var(--accent);box-shadow:0 0 0 2px rgba(228,155,24,.15)}
+  .summary-wrap{margin-top:26px;border:1.5px solid #3d444b;background:#fff}
+  .summary-title{padding:10px 12px;font-weight:800;border-bottom:1px solid var(--line);background:#f7f8fa}
+  .summary{display:grid;grid-template-columns:repeat(4,1fr)}
+  .summary.show{display:grid}
+  .summary > div{text-align:center;padding:12px;border-right:1px solid var(--line)}
+  .summary > div:last-child{border-right:0}
+  .summary strong{display:block;margin-top:4px;font-size:1.2rem}
+  .note{margin-top:10px;color:var(--muted);font-size:.84rem;text-align:center}
+  .jpg-modal{
+    display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.72);
+    padding:18px;overflow:auto;
+  }
+  .jpg-modal.show{display:block}
+  .jpg-box{
+    width:min(980px,100%);margin:0 auto;background:#fff;border-radius:14px;
+    padding:14px;box-shadow:0 10px 40px rgba(0,0,0,.28)
+  }
+  .jpg-actions{
+    display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;
+    margin-bottom:10px
+  }
+  .jpg-help{font-size:.9rem;color:var(--muted);margin:0}
+  .jpg-preview{display:block;width:100%;height:auto;border:1px solid var(--line);background:#fff}
+
+  .tag{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:999px;font-size:.78rem;background:#eef2f6;color:#475467}
+  @media (max-width:760px){
+    .sheet{padding:18px 14px 28px}
+    .head{grid-template-columns:1fr}
+    .head-left{border-right:0;border-bottom:1.5px solid #30363b}
+    .meta{grid-template-columns:1fr}
+    .grid2,.grid3{grid-template-columns:1fr}
+    .classify-row{grid-template-columns:1fr}
+    .summary{grid-template-columns:repeat(2,1fr)}
+    .summary > div:nth-child(2){border-right:0}
+    .summary > div:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <button id="saveBtn">GORDE</button>
+    <button id="checkBtn" class="primary">ZUZENDU</button>
+    <button id="sendBtn" class="accent">BIDALI IRAKASLEARI</button>
+    <button id="jpgBtn">GORDE JPG</button>
+    <button id="clearBtn" class="danger">GARBITU</button>
+    <span class="status" id="status">Prest</span>
+  </div>
+
+  <main class="sheet">
+    <section class="head">
+      <div class="head-left">
+        <div class="bar"></div>
+        <strong>ERREPASOA</strong>
+        <span>ARITMETIKA</span>
+      </div>
+      <div class="head-right">
+        <div class="course">DBH4DC · MATEMATIKA</div>
+        <h1>ARITMETIKA-1</h1>
+        <div class="meta">
+          <div class="field">
+            <label for="student">Izen-abizenak:</label>
+            <input id="student" type="text" autocomplete="name">
+          </div>
+          <div class="field">
+            <label for="group">Taldea:</label>
+            <input id="group" type="text" value="DBH4DC">
+          </div>
+          <div class="scorebox" id="scoreBox">NOTA: —</div>
+        </div>
+      </div>
+    </section>
+    <div class="info">
+      <strong>Nola egin:</strong> osatu ariketa guztiak eta, amaitzean, sakatu
+      <strong>ZUZENDU</strong>. Ondoren, zure lana irakasleari bidaltzeko, sakatu
+      <strong>BIDALI IRAKASLEARI</strong>. Nahi baduzu, fitxa osoa
+      <strong>JPG</strong> irudi gisa ere gorde dezakezu.
+    </div>
+<section class="exercise">
+      <div class="num">1</div>
+      <div>
+        <p class="title">Faktore lehenetako deskonposizioa eraiki</p>
+        <p class="subtext">Zenbaki lehen bakoitza behin bakarrik agertzen da. Faktore bat behin baino gehiagotan behar baduzu, klikatu zenbaki berean hainbat aldiz. Azpian osatutako deskonposizioa ikusiko duzu.</p>
+        <div class="grid2">
+          <div class="card">
+            <p class="prompt"><strong>a) 180</strong> zenbakiaren deskonposizioa</p>
+            <div class="chips factor-builder" data-qid="q1a" data-target="180">
+              <button type="button" class="chip" data-value="2">2<span class="count">0</span></button>
+              <button type="button" class="chip" data-value="3">3<span class="count">0</span></button>
+              <button type="button" class="chip" data-value="5">5<span class="count">0</span></button>
+              <button type="button" class="chip" data-value="7">7<span class="count">0</span></button>
+            </div>
+            <div class="build" id="build-q1a"><span class="placeholder">Aukeratutako faktoreak hemen agertuko dira</span></div>
+            <div class="factor-actions">
+              <button type="button" class="undo-factor" data-qid="q1a">KENDU AZKENA</button>
+              <button type="button" class="clear-factors" data-qid="q1a">GARBITU</button>
+            </div>
+            <div><span class="feedback" data-feedback-for="q1a"></span></div>
+          </div>
+          <div class="card">
+            <p class="prompt"><strong>b) 84</strong> zenbakiaren deskonposizioa</p>
+            <div class="chips factor-builder" data-qid="q1b" data-target="84">
+              <button type="button" class="chip" data-value="2">2<span class="count">0</span></button>
+              <button type="button" class="chip" data-value="3">3<span class="count">0</span></button>
+              <button type="button" class="chip" data-value="5">5<span class="count">0</span></button>
+              <button type="button" class="chip" data-value="7">7<span class="count">0</span></button>
+            </div>
+            <div class="build" id="build-q1b"><span class="placeholder">Aukeratutako faktoreak hemen agertuko dira</span></div>
+            <div class="factor-actions">
+              <button type="button" class="undo-factor" data-qid="q1b">KENDU AZKENA</button>
+              <button type="button" class="clear-factors" data-qid="q1b">GARBITU</button>
+            </div>
+            <div><span class="feedback" data-feedback-for="q1b"></span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="exercise">
+      <div class="num">2</div>
+      <div>
+        <p class="title">Aukeratu mkt zuzena</p>
+        <div class="grid2">
+          <div class="card">
+            <p class="prompt"><span class="expr">mkt(12, 18)</span> da...</p>
+            <div class="choices" data-choice-group="q2a" data-answer="36">
+              <label class="choice"><input type="radio" name="q2a" value="24"> 24</label>
+              <label class="choice"><input type="radio" name="q2a" value="36"> 36</label>
+              <label class="choice"><input type="radio" name="q2a" value="48"> 48</label>
+              <label class="choice"><input type="radio" name="q2a" value="72"> 72</label>
+            </div>
+            <div><span class="feedback" data-feedback-for="q2a"></span></div>
+          </div>
+          <div class="card">
+            <p class="prompt"><span class="expr">mkt(15, 24)</span> da...</p>
+            <div class="choices" data-choice-group="q2b" data-answer="120">
+              <label class="choice"><input type="radio" name="q2b" value="60"> 60</label>
+              <label class="choice"><input type="radio" name="q2b" value="90"> 90</label>
+              <label class="choice"><input type="radio" name="q2b" value="120"> 120</label>
+              <label class="choice"><input type="radio" name="q2b" value="180"> 180</label>
+            </div>
+            <div><span class="feedback" data-feedback-for="q2b"></span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="exercise">
+      <div class="num">3</div>
+      <div>
+        <p class="title">Ordenatu eragiketaren urrats guztiak</p>
+        <p class="subtext">
+          Urratsak nahasian daude. Jarri kalkulua egiteko ordena egokian.
+          Ordenagailuan txartelak arrastatu ditzakezu; bestela ↑ eta ↓ botoiak erabil ditzakezu.
+        </p>
+
+        <div class="grid2">
+          <div class="card">
+            <p class="prompt"><strong>a)</strong> <span class="expr">18 − 3 · [4 − (−2)]</span></p>
+            <div class="sortable" id="sortable-q3a"
+              data-correct='["4 − (−2) = 6","18 − 3 · 6","3 · 6 = 18","18 − 18","0"]'>
+              <div class="sort-item" draggable="true"><div>18 − 18</div><div class="sort-controls"><button type="button" class="up">↑</button> <button type="button" class="down">↓</button></div></div>
+              <div class="sort-item" draggable="true"><div>4 − (−2) = 6</div><div class="sort-controls"><button type="button" class="up">↑</button> <button type="button" class="down">↓</button></div></div>
+              <div class="sort-item" draggable="true"><div>0</div><div class="sort-controls"><button type="button" class="up">↑</button> <button type="button" class="down">↓</button></div></div>
+              <div class="sort-item" draggable="true"><div>3 · 6 = 18</div><div class="sort-controls"><button type="button" class="up">↑</button> <button type="button" class="down">↓</button></div></div>
+              <div class="sort-item" draggable="true"><div>18 − 3 · 6</div><div class="sort-controls"><button type="button" class="up">↑</button> <button type="button" class="down">↓</button></div></div>
+            </div>
+            <div style="margin-top:8px"><span class="feedback" data-feedback-for="q3a"></span></div>
+          </div>
+
+          <div class="card">
+            <p class="prompt"><strong>b)</strong> <span class="expr">24 : [3 · (−2) + 10]</span></p>
+            <div class="sortable" id="sortable-q3b"
+              data-correct='["3 · (−2) = −6","24 : [−6 + 10]","−6 + 10 = 4","24 : 4","6"]'>
+              <div class="sort-item" draggable="true"><div>24 : 4</div><div class="sort-controls"><button type="button" class="up">↑</button> <button type="button" class="down">↓</button></div></div>
+              <div class="sort-item" draggable="true"><div>3 · (−2) = −6</div><div class="sort-controls"><button type="button" class="up">↑</button> <button type="button" class="down">↓</button></div></div>
+              <div class="sort-item" draggable="true"><div>6</div><div class="sort-controls"><button type="button" class="up">↑</button> <button type="button" class="down">↓</button></div></div>
+              <div class="sort-item" draggable="true"><div>−6 + 10 = 4</div><div class="sort-controls"><button type="button" class="up">↑</button> <button type="button" class="down">↓</button></div></div>
+              <div class="sort-item" draggable="true"><div>24 : [−6 + 10]</div><div class="sort-controls"><button type="button" class="up">↑</button> <button type="button" class="down">↓</button></div></div>
+            </div>
+            <div style="margin-top:8px"><span class="feedback" data-feedback-for="q3b"></span></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <p class="prompt"><strong>c)</strong> <span class="expr">7 − [4 − 3 · (2 − 6)]</span></p>
+          <div class="sortable" id="sortable-q3c"
+            data-correct='["2 − 6 = −4","7 − [4 − 3 · (−4)]","3 · (−4) = −12","7 − [4 − (−12)]","4 − (−12) = 16","7 − 16","−9"]'>
+            <div class="sort-item" draggable="true"><div>7 − 16</div><div class="sort-controls"><button type="button" class="up">↑</button> <button type="button" class="down">↓</button></div></div>
+            <div class="sort-item" draggable="true"><div>3 · (−4) = −12</div><div class="sort-controls"><button type="button" class="up">↑</button> <button type="button" class="down">↓</button></div></div>
+            <div class="sort-item" draggable="true"><div>2 − 6 = −4</div><div class="sort-controls"><button type="button" class="up">↑</button> <button type="button" class="down">↓</button></div></div>
+            <div class="sort-item" draggable="true"><div>−9</div><div class="sort-controls"><button type="button" class="up">↑</button> <button type="button" class="down">↓</button></div></div>
+            <div class="sort-item" draggable="true"><div>4 − (−12) = 16</div><div class="sort-controls"><button type="button" class="up">↑</button> <button type="button" class="down">↓</button></div></div>
+            <div class="sort-item" draggable="true"><div>7 − [4 − 3 · (−4)]</div><div class="sort-controls"><button type="button" class="up">↑</button> <button type="button" class="down">↓</button></div></div>
+            <div class="sort-item" draggable="true"><div>7 − [4 − (−12)]</div><div class="sort-controls"><button type="button" class="up">↑</button> <button type="button" class="down">↓</button></div></div>
+          </div>
+          <div style="margin-top:8px"><span class="feedback" data-feedback-for="q3c"></span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="exercise">
+      <div class="num">4</div>
+      <div>
+        <p class="title">Aurkitu akatsa</p>
+        <div class="card">
+          <p class="prompt">Leirek honela egin du:</p>
+          <p class="expr">8 − 3 · (−2) = 5 · (−2) = −10</p>
+          <p class="prompt">Non dago akatsa?</p>
+          <div class="choices" data-choice-group="q4" data-answer="Lehenengo kenketa egin du.">
+            <label class="choice"><input type="radio" name="q4" value="Lehenengo kenketa egin du."> Lehenengo kenketa egin du.</label>
+            <label class="choice"><input type="radio" name="q4" value="Zeinua gaizki aldatu du."> Zeinua gaizki aldatu du.</label>
+            <label class="choice"><input type="radio" name="q4" value="Biderketa gaizki egin du."> Biderketa gaizki egin du.</label>
+            <label class="choice"><input type="radio" name="q4" value="Ez dago akatsik."> Ez dago akatsik.</label>
+          </div>
+          <div><span class="feedback" data-feedback-for="q4"></span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="exercise">
+      <div class="num">5</div>
+      <div>
+        <p class="title">Ordenatu txikienetik handienera</p>
+        <p class="subtext">Mugi itzazu elementuak gora edo behera.</p>
+        <div class="sortable" id="sortable-q5" data-correct='["−7","−1","0","2"]'>
+          <div class="sort-item" draggable="true"><div>2</div><div class="sort-controls"><button type="button" class="up">↑</button> <button type="button" class="down">↓</button></div></div>
+          <div class="sort-item" draggable="true"><div>0</div><div class="sort-controls"><button type="button" class="up">↑</button> <button type="button" class="down">↓</button></div></div>
+          <div class="sort-item" draggable="true"><div>−7</div><div class="sort-controls"><button type="button" class="up">↑</button> <button type="button" class="down">↓</button></div></div>
+          <div class="sort-item" draggable="true"><div>−1</div><div class="sort-controls"><button type="button" class="up">↑</button> <button type="button" class="down">↓</button></div></div>
+        </div>
+        <div style="margin-top:8px"><span class="feedback" data-feedback-for="q5"></span></div>
+      </div>
+    </section>
+
+    <section class="exercise">
+      <div class="num">6</div>
+      <div>
+        <p class="title">Kalkulatu</p>
+        <div class="grid3">
+          <div class="card">
+            <p class="prompt"><span class="expr">15 − 2[3 − (7 − 10)] =</span></p>
+            <input class="answer direct-answer" data-qid="q6a" data-answer="3" inputmode="decimal">
+            <span class="feedback" data-feedback-for="q6a"></span>
+          </div>
+          <div class="card">
+            <p class="prompt"><span class="expr">24 : [3·(−2) + 10] =</span></p>
+            <input class="answer direct-answer" data-qid="q6b" data-answer="6" inputmode="decimal">
+            <span class="feedback" data-feedback-for="q6b"></span>
+          </div>
+          <div class="card">
+            <p class="prompt"><span class="expr">(−6 + 14)·3 − 5·(−2) =</span></p>
+            <input class="answer direct-answer" data-qid="q6c" data-answer="34" inputmode="decimal">
+            <span class="feedback" data-feedback-for="q6c"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="exercise">
+      <div class="num">7</div>
+      <div>
+        <p class="title">Sailkatu zenbaki hamartarrak</p>
+        <p class="subtext">
+          Aukeratu zenbaki bakoitzari dagokion mota:
+          <strong>zehatza</strong>, <strong>periodiko purua</strong>,
+          <strong>periodiko mistoa</strong> edo
+          <strong>infinitu ez-periodikoa</strong>.
+        </p>
+
+        <div class="classify-list">
+          <div class="classify-row">
+            <div class="classify-number">a) 4,125</div>
+            <select class="classify-select" data-qid="q7a" data-answer="Zehatza">
+              <option value="">— Aukeratu —</option>
+              <option>Zehatza</option>
+              <option>Periodiko purua</option>
+              <option>Periodiko mistoa</option>
+              <option>Infinitu ez-periodikoa</option>
+            </select>
+            <span class="feedback" data-feedback-for="q7a"></span>
+          </div>
+
+          <div class="classify-row">
+            <div class="classify-number">b) 0,272727...</div>
+            <select class="classify-select" data-qid="q7b" data-answer="Periodiko purua">
+              <option value="">— Aukeratu —</option>
+              <option>Zehatza</option>
+              <option>Periodiko purua</option>
+              <option>Periodiko mistoa</option>
+              <option>Infinitu ez-periodikoa</option>
+            </select>
+            <span class="feedback" data-feedback-for="q7b"></span>
+          </div>
+
+          <div class="classify-row">
+            <div class="classify-number">c) 1,36666...</div>
+            <select class="classify-select" data-qid="q7c" data-answer="Periodiko mistoa">
+              <option value="">— Aukeratu —</option>
+              <option>Zehatza</option>
+              <option>Periodiko purua</option>
+              <option>Periodiko mistoa</option>
+              <option>Infinitu ez-periodikoa</option>
+            </select>
+            <span class="feedback" data-feedback-for="q7c"></span>
+          </div>
+
+          <div class="classify-row">
+            <div class="classify-number">d) √2 = 1,41421356...</div>
+            <select class="classify-select" data-qid="q7d" data-answer="Infinitu ez-periodikoa">
+              <option value="">— Aukeratu —</option>
+              <option>Zehatza</option>
+              <option>Periodiko purua</option>
+              <option>Periodiko mistoa</option>
+              <option>Infinitu ez-periodikoa</option>
+            </select>
+            <span class="feedback" data-feedback-for="q7d"></span>
+          </div>
+
+          <div class="classify-row">
+            <div class="classify-number">e) 2,083333...</div>
+            <select class="classify-select" data-qid="q7e" data-answer="Periodiko mistoa">
+              <option value="">— Aukeratu —</option>
+              <option>Zehatza</option>
+              <option>Periodiko purua</option>
+              <option>Periodiko mistoa</option>
+              <option>Infinitu ez-periodikoa</option>
+            </select>
+            <span class="feedback" data-feedback-for="q7e"></span>
+          </div>
+
+          <div class="classify-row">
+            <div class="classify-number">f) 7,343434...</div>
+            <select class="classify-select" data-qid="q7f" data-answer="Periodiko purua">
+              <option value="">— Aukeratu —</option>
+              <option>Zehatza</option>
+              <option>Periodiko purua</option>
+              <option>Periodiko mistoa</option>
+              <option>Infinitu ez-periodikoa</option>
+            </select>
+            <span class="feedback" data-feedback-for="q7f"></span>
+          </div>
+
+          <div class="classify-row">
+            <div class="classify-number">g) 0,0064</div>
+            <select class="classify-select" data-qid="q7g" data-answer="Zehatza">
+              <option value="">— Aukeratu —</option>
+              <option>Zehatza</option>
+              <option>Periodiko purua</option>
+              <option>Periodiko mistoa</option>
+              <option>Infinitu ez-periodikoa</option>
+            </select>
+            <span class="feedback" data-feedback-for="q7g"></span>
+          </div>
+
+          <div class="classify-row">
+            <div class="classify-number">h) π = 3,14159265...</div>
+            <select class="classify-select" data-qid="q7h" data-answer="Infinitu ez-periodikoa">
+              <option value="">— Aukeratu —</option>
+              <option>Zehatza</option>
+              <option>Periodiko purua</option>
+              <option>Periodiko mistoa</option>
+              <option>Infinitu ez-periodikoa</option>
+            </select>
+            <span class="feedback" data-feedback-for="q7h"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="summary-wrap" id="summaryWrap">
+      <div class="summary-title">EMAITZEN LABURPENA</div>
+      <div class="summary show" id="summary">
+        <div>Zuzenak<strong id="correctCount">—</strong></div>
+        <div>Guztira<strong id="totalCount">—</strong></div>
+        <div>Ehunekoa<strong id="percent">—</strong></div>
+        <div>Nota / 10<strong id="grade">—</strong></div>
+      </div>
+    </section>
+<div id="sentBanner" style="display:none;margin-top:12px;padding:10px 12px;border:1px solid #b7dfc4;background:#effcf3;border-radius:10px;color:#116b35;font-weight:700;text-align:center;">
+      ✓ Zure lana irakasleari bidali zaio.
+    </div>
+
+    <div class="note">
+      Zure azken emaitza eta ariketa bakoitzean emandako erantzunak irakasleari bidaliko zaizkio.
+    </div>
+  </main>
+  <div class="jpg-modal" id="jpgModal" aria-hidden="true">
+    <div class="jpg-box">
+      <div class="jpg-actions">
+        <p class="jpg-help">
+          JPG prest. Deskarga automatikoki hasten ez bada, egin eskuineko klik irudiaren gainean
+          eta aukeratu <strong>“Gorde irudia honela…”</strong>.
+        </p>
+        <button type="button" id="closeJpgBtn">ITXI</button>
+      </div>
+      <img id="jpgPreview" class="jpg-preview" alt="Ariketa-orriaren JPG aurrebista">
+    </div>
+  </div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+(() => {
+  const STORAGE_KEY = "aritmetika1_azkena_v2";
+  const WEBAPP_URL = "https://script.google.com/a/macros/hernanibhi.com/s/AKfycbynVcfKX7uCCP59cLmFoMjiuK6uHemVGCvj2S1ioAVQYDbh_TfIVvgGG1uRwtvUBzxpyA/exec";
+  const statusEl = document.getElementById("status");
+  const studentEl = document.getElementById("student");
+  const groupEl = document.getElementById("group");
+  const scoreBox = document.getElementById("scoreBox");
+  const summary = document.getElementById("summary");
+  const directInputs = [...document.querySelectorAll(".direct-answer")];
+  const factorBuilders = [...document.querySelectorAll(".factor-builder")];
+  const classifySelects = [...document.querySelectorAll(".classify-select")];
+
+  function setStatus(msg){ statusEl.textContent = msg; }
+  function moveItem(item, direction){
+    const parent = item.parentElement;
+    if(direction === "up" && item.previousElementSibling){ parent.insertBefore(item, item.previousElementSibling); }
+    if(direction === "down" && item.nextElementSibling){ parent.insertBefore(item.nextElementSibling, item); }
+    markDirty();
+  }
+  document.querySelectorAll(".sortable").forEach(sortable => {
+    sortable.addEventListener("click", e => {
+      if(e.target.classList.contains("up")) moveItem(e.target.closest(".sort-item"), "up");
+      if(e.target.classList.contains("down")) moveItem(e.target.closest(".sort-item"), "down");
+    });
+
+    let dragged = null;
+
+    sortable.addEventListener("dragstart", e => {
+      const item = e.target.closest(".sort-item");
+      if(!item) return;
+      dragged = item;
+      item.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+    });
+
+    sortable.addEventListener("dragend", () => {
+      sortable.querySelectorAll(".sort-item").forEach(i => i.classList.remove("dragging","drag-over"));
+      dragged = null;
+      markDirty();
+    });
+
+    sortable.addEventListener("dragover", e => {
+      e.preventDefault();
+      const target = e.target.closest(".sort-item");
+      if(!dragged || !target || target === dragged) return;
+      sortable.querySelectorAll(".sort-item").forEach(i => i.classList.remove("drag-over"));
+      target.classList.add("drag-over");
+
+      const rect = target.getBoundingClientRect();
+      const before = e.clientY < rect.top + rect.height / 2;
+      sortable.insertBefore(dragged, before ? target : target.nextSibling);
+    });
+  });
+  const factorHistory = {};
+
+  function renderFactorBuild(builder){
+    const qid = builder.dataset.qid;
+    const build = document.getElementById("build-" + qid);
+    const selected = factorHistory[qid] || [];
+
+    builder.querySelectorAll(".chip").forEach(chip => {
+      const value = Number(chip.dataset.value);
+      const count = selected.filter(v => v === value).length;
+      const badge = chip.querySelector(".count");
+      if(badge) badge.textContent = count;
+      chip.classList.toggle("has-count", count > 0);
+      chip.classList.toggle("active", count > 0);
+    });
+
+    if(!selected.length){
+      build.innerHTML = '<span class="placeholder">Aukeratutako faktoreak hemen agertuko dira</span>';
+      return;
+    }
+
+    build.innerHTML = selected
+      .slice()
+      .sort((a,b)=>a-b)
+      .map(n => `<span class="mini">${n}</span>`)
+      .join("<span>·</span>");
+  }
+
+  factorBuilders.forEach(builder => {
+    const qid = builder.dataset.qid;
+    factorHistory[qid] = [];
+
+    builder.addEventListener("click", e => {
+      const chip = e.target.closest(".chip");
+      if(!chip) return;
+      factorHistory[qid].push(Number(chip.dataset.value));
+      renderFactorBuild(builder);
+      markDirty();
+    });
+
+    renderFactorBuild(builder);
+  });
+
+  document.querySelectorAll(".undo-factor").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const qid = btn.dataset.qid;
+      const builder = document.querySelector(`.factor-builder[data-qid="${qid}"]`);
+      factorHistory[qid].pop();
+      renderFactorBuild(builder);
+      markDirty();
+    });
+  });
+
+  document.querySelectorAll(".clear-factors").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const qid = btn.dataset.qid;
+      const builder = document.querySelector(`.factor-builder[data-qid="${qid}"]`);
+      factorHistory[qid] = [];
+      renderFactorBuild(builder);
+      markDirty();
+    });
+  });
+
+  function getFactorSelection(qid){
+    return [...(factorHistory[qid] || [])];
+  }
+  function product(arr){ return arr.reduce((a,b)=>a*b,1); }
+  function checkFactor(qid){
+    const builder = document.querySelector(`.factor-builder[data-qid="${qid}"]`);
+    const target = Number(builder.dataset.target);
+    const arr = getFactorSelection(qid);
+    const ok = arr.length > 0 && product(arr) === target;
+    paintFeedback(qid, ok, arr.length > 0);
+    return ok;
+  }
+  function getChoiceAnswer(qid){
+    const checked = document.querySelector(`input[name="${qid}"]:checked`);
+    return checked ? checked.value : "";
+  }
+  function checkChoice(qid){
+    const group = document.querySelector(`[data-choice-group="${qid}"]`);
+    const expected = group.dataset.answer;
+    const got = getChoiceAnswer(qid);
+    const answered = got !== "";
+    const ok = answered && got === expected;
+    paintFeedback(qid, ok, answered);
+    return ok;
+  }
+  function getSortableOrder(qid){
+    const sortable = document.getElementById("sortable-" + qid);
+    return [...sortable.querySelectorAll(".sort-item > div:first-child")].map(el => el.textContent.trim());
+  }
+  function checkSortable(qid){
+    const sortable = document.getElementById("sortable-" + qid);
+    const expected = JSON.parse(sortable.dataset.correct);
+    const got = getSortableOrder(qid);
+    const ok = JSON.stringify(expected) === JSON.stringify(got);
+    paintFeedback(qid, ok, true);
+    return ok;
+  }
+  function parseNumber(s){ return Number(String(s).trim().replace(",", ".")); }
+  function checkDirect(qid){
+    const input = document.querySelector(`.direct-answer[data-qid="${qid}"]`);
+    const expected = Number(input.dataset.answer);
+    const answered = input.value.trim() !== "";
+    const ok = answered && Math.abs(parseNumber(input.value) - expected) < 1e-9;
+    input.classList.remove("correct","wrong");
+    if(answered) input.classList.add(ok ? "correct" : "wrong");
+    paintFeedback(qid, ok, answered);
+    return ok;
+  }
+  function checkClassification(qid){
+    const select = document.querySelector(`.classify-select[data-qid="${qid}"]`);
+    const expected = select.dataset.answer;
+    const got = select.value;
+    const answered = got !== "";
+    const ok = answered && got === expected;
+
+    select.classList.remove("correct","wrong");
+    if(answered) select.classList.add(ok ? "correct" : "wrong");
+    paintFeedback(qid, ok, answered);
+    return ok;
+  }
+
+  function paintFeedback(qid, ok, answered){
+    const fb = document.querySelector(`[data-feedback-for="${qid}"]`);
+    if(!fb) return;
+    fb.className = "feedback";
+    if(!answered){ fb.textContent = ""; return; }
+    fb.classList.add(ok ? "ok" : "bad");
+    fb.textContent = ok ? "✓" : "✗";
+  }
+  function clearPaint(){
+    document.querySelectorAll(".feedback").forEach(fb => { fb.className = "feedback"; fb.textContent = ""; });
+    directInputs.forEach(inp => inp.classList.remove("correct","wrong"));
+    classifySelects.forEach(sel => sel.classList.remove("correct","wrong"));
+    summary.classList.add("show");
+    document.getElementById("correctCount").textContent = "—";
+    document.getElementById("totalCount").textContent = "—";
+    document.getElementById("percent").textContent = "—";
+    document.getElementById("grade").textContent = "—";
+    scoreBox.textContent = "NOTA: —";
+  }
+  function evaluateAll(){
+    let correct = 0;
+    const results = [];
+    const q1a = checkFactor("q1a"); correct += Number(q1a); results.push({qid:"q1a", type:"factor-builder", correct:q1a, response:getFactorSelection("q1a")});
+    const q1b = checkFactor("q1b"); correct += Number(q1b); results.push({qid:"q1b", type:"factor-builder", correct:q1b, response:getFactorSelection("q1b")});
+    const q2a = checkChoice("q2a"); correct += Number(q2a); results.push({qid:"q2a", type:"choice", correct:q2a, response:getChoiceAnswer("q2a")});
+    const q2b = checkChoice("q2b"); correct += Number(q2b); results.push({qid:"q2b", type:"choice", correct:q2b, response:getChoiceAnswer("q2b")});
+    const q3a = checkSortable("q3a"); correct += Number(q3a); results.push({qid:"q3a", type:"ordering-steps", correct:q3a, response:getSortableOrder("q3a")});
+    const q3b = checkSortable("q3b"); correct += Number(q3b); results.push({qid:"q3b", type:"ordering-steps", correct:q3b, response:getSortableOrder("q3b")});
+    const q3c = checkSortable("q3c"); correct += Number(q3c); results.push({qid:"q3c", type:"ordering-steps", correct:q3c, response:getSortableOrder("q3c")});
+    const q4 = checkChoice("q4"); correct += Number(q4); results.push({qid:"q4", type:"choice", correct:q4, response:getChoiceAnswer("q4")});
+    const q5 = checkSortable("q5"); correct += Number(q5); results.push({qid:"q5", type:"ordering", correct:q5, response:getSortableOrder("q5")});
+    const q6a = checkDirect("q6a"); correct += Number(q6a); results.push({qid:"q6a", type:"numeric", correct:q6a, response:document.querySelector('[data-qid="q6a"]').value});
+    const q6b = checkDirect("q6b"); correct += Number(q6b); results.push({qid:"q6b", type:"numeric", correct:q6b, response:document.querySelector('[data-qid="q6b"]').value});
+    const q6c = checkDirect("q6c"); correct += Number(q6c); results.push({qid:"q6c", type:"numeric", correct:q6c, response:document.querySelector('[data-qid="q6c"]').value});
+    for(const suffix of ["a","b","c","d","e","f","g","h"]){
+      const qid = "q7" + suffix;
+      const ok = checkClassification(qid);
+      correct += Number(ok);
+      const sel = document.querySelector(`.classify-select[data-qid="${qid}"]`);
+      results.push({
+        qid,
+        type:"decimal-classification",
+        correct:ok,
+        response:sel.value
+      });
+    }
+        const total = results.length;
+    const pct = Math.round((correct/total)*100);
+    const grade = (correct/total)*10;
+    document.getElementById("correctCount").textContent = correct;
+    document.getElementById("totalCount").textContent = total;
+    document.getElementById("percent").textContent = pct + "%";
+    document.getElementById("grade").textContent = grade.toFixed(1).replace(".", ",");
+    scoreBox.textContent = "NOTA: " + grade.toFixed(1).replace(".", ",");
+    summary.classList.add("show");
+    return {correct, total, pct, grade, results};
+  }
+  function buildPayload(){
+    const evaluated = evaluateAll();
+    return {
+      worksheet: "ARITMETIKA-1",
+      timestamp: new Date().toISOString(),
+      student: studentEl.value.trim(),
+      group: groupEl.value.trim(),
+      summary: {correct:evaluated.correct, total:evaluated.total, percent:evaluated.pct, grade10:Number(evaluated.grade.toFixed(1))},
+      results: evaluated.results
+    };
+  }
+  function saveLocal(show=true){
+    const data = {
+      student: studentEl.value, group: groupEl.value,
+      factors: {q1a:getFactorSelection("q1a"), q1b:getFactorSelection("q1b")},
+      choices: {q2a:getChoiceAnswer("q2a"), q2b:getChoiceAnswer("q2b"), q4:getChoiceAnswer("q4")},
+      orderings: {q3a:getSortableOrder("q3a"), q3b:getSortableOrder("q3b"), q3c:getSortableOrder("q3c"), q5:getSortableOrder("q5")},
+      direct: {
+        q6a: document.querySelector('[data-qid="q6a"]').value,
+        q6b: document.querySelector('[data-qid="q6b"]').value,
+        q6c: document.querySelector('[data-qid="q6c"]').value
+      },
+      classifications: Object.fromEntries(
+        classifySelects.map(sel => [sel.dataset.qid, sel.value])
+      )
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    if(show){ setStatus("Gordeta ✓"); setTimeout(()=>setStatus("Prest"), 1500); }
+  }
+  function restoreState(){
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return;
+    try{
+      const data = JSON.parse(raw);
+      studentEl.value = data.student || "";
+      groupEl.value = data.group || "DBH4DC";
+      factorBuilders.forEach(builder => {
+        const qid = builder.dataset.qid;
+        factorHistory[qid] = [...((data.factors && data.factors[qid]) || [])];
+        renderFactorBuild(builder);
+      });
+      Object.entries((data.choices || {})).forEach(([qid, value]) => {
+        const radio = document.querySelector(`input[name="${qid}"][value="${CSS.escape(value)}"]`);
+        if(radio) radio.checked = true;
+      });
+      Object.entries((data.direct || {})).forEach(([qid, value]) => {
+        const input = document.querySelector(`.direct-answer[data-qid="${qid}"]`);
+        if(input) input.value = value;
+      });
+      Object.entries((data.classifications || {})).forEach(([qid, value]) => {
+        const select = document.querySelector(`.classify-select[data-qid="${qid}"]`);
+        if(select) select.value = value;
+      });
+      ["q3a","q3b","q3c","q5"].forEach(qid => {
+        const desired = data.orderings && data.orderings[qid];
+        if(!desired) return;
+        const sortable = document.getElementById("sortable-" + qid);
+        const items = [...sortable.querySelectorAll(".sort-item")];
+        desired.forEach(text => {
+          const item = items.find(it => it.querySelector("div").textContent.trim() === text);
+          if(item) sortable.appendChild(item);
+        });
+      });
+      setStatus("Aurreko lana kargatuta");
+      setTimeout(()=>setStatus("Prest"), 1700);
+    }catch(e){}
+  }
+  function markDirty(){
+    clearPaint();
+    const sentBanner = document.getElementById("sentBanner");
+    if(sentBanner) sentBanner.style.display = "none";
+    setStatus("Aldaketak gordetzeke");
+  }
+  async function sendToTeacher(){
+    if(!studentEl.value.trim()){
+      alert("Mesedez, idatzi lehenengo ikaslearen izen-abizenak.");
+      studentEl.focus();
+      return;
+    }
+
+    const confirmed = confirm(
+      "Zure emaitzak irakasleari bidali nahi dizkiozu?\n\n" +
+      "Bidalketa bakoitza saiakera berri gisa gordeko da."
+    );
+    if(!confirmed) return;
+
+    const payload = buildPayload();
+    saveLocal(false);
+    setStatus("Bidaltzen…");
+
+    try{
+      await fetch(WEBAPP_URL, {
+        method: "POST",
+        mode: "no-cors",
+        credentials: "include",
+        headers: {"Content-Type":"text/plain;charset=UTF-8"},
+        body: JSON.stringify(payload)
+      });
+
+      setStatus("Bidalketa eginda ✓");
+      alert("Zure lana irakasleari bidali zaio.");
+      const sentBanner = document.getElementById("sentBanner");
+      if(sentBanner) sentBanner.style.display = "block";
+      setTimeout(()=>setStatus("Prest"), 1800);
+
+    }catch(err){
+      console.error(err);
+      setStatus("Bidalketa errorea");
+      alert("Ezin izan da lana bidali. Egiaztatu Internet konexioa eta saiatu berriro.");
+    }
+  }
+
+  async function saveAsJpg(){
+    if(typeof html2canvas === "undefined"){
+      alert("Ezin izan da JPG sortzeko osagaia kargatu. Egiaztatu Internet konexioa.");
+      return;
+    }
+
+    evaluateAll();
+    saveLocal(false);
+    setStatus("JPG sortzen…");
+
+    try{
+      const sheet = document.querySelector(".sheet");
+      const canvas = await html2canvas(sheet, {
+        scale: 2,
+        backgroundColor: "#ffffff",
+        useCORS: true,
+        logging: false
+      });
+
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+
+      const preview = document.getElementById("jpgPreview");
+      const modal = document.getElementById("jpgModal");
+      preview.src = dataUrl;
+      modal.classList.add("show");
+      modal.setAttribute("aria-hidden", "false");
+
+      const safeName = (studentEl.value.trim() || "ikaslea")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^\w\-]+/g, "_");
+
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = `ARITMETIKA-1_${safeName}.jpg`;
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      setStatus("JPG prest ✓");
+      setTimeout(()=>setStatus("Prest"), 1800);
+
+    }catch(err){
+      console.error(err);
+      setStatus("Errorea JPG sortzean");
+      alert("Ezin izan da JPG sortu. Saiatu berriro.");
+    }
+  }
+
+  let clearArmed = false;
+  let clearTimer = null;
+
+  function clearAll(){
+    const btn = document.getElementById("clearBtn");
+
+    if(!clearArmed){
+      clearArmed = true;
+      btn.textContent = "ZIUR? SAKATU BERRIRO";
+      setStatus("Garbitzeko, sakatu berriro");
+      clearTimer = setTimeout(() => {
+        clearArmed = false;
+        btn.textContent = "GARBITU";
+        setStatus("Prest");
+      }, 3500);
+      return;
+    }
+
+    clearTimeout(clearTimer);
+    clearArmed = false;
+    btn.textContent = "GARBITU";
+
+    localStorage.removeItem(STORAGE_KEY);
+    studentEl.value = "";
+    groupEl.value = "DBH4DC";
+
+    factorBuilders.forEach(builder => {
+      const qid = builder.dataset.qid;
+      factorHistory[qid] = [];
+      renderFactorBuild(builder);
+    });
+
+    document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+    directInputs.forEach(inp => inp.value = "");
+    classifySelects.forEach(sel => sel.value = "");
+
+    clearPaint();
+    setStatus("Garbituta ✓");
+    setTimeout(()=>setStatus("Prest"), 1500);
+  }
+  document.getElementById("saveBtn").addEventListener("click", () => saveLocal(true));
+  document.getElementById("checkBtn").addEventListener("click", () => { evaluateAll(); saveLocal(false); setStatus("Zuzenduta"); setTimeout(()=>setStatus("Prest"), 1200); });
+  document.getElementById("sendBtn").addEventListener("click", sendToTeacher);
+  document.getElementById("jpgBtn").addEventListener("click", saveAsJpg);
+  document.getElementById("clearBtn").addEventListener("click", clearAll);
+  [studentEl, groupEl, ...directInputs].forEach(el => {
+    el.addEventListener("input", markDirty);
+    el.addEventListener("change", () => saveLocal(false));
+  });
+  document.querySelectorAll('input[type="radio"]').forEach(r => {
+    r.addEventListener("change", () => { markDirty(); saveLocal(false); });
+  });
+  classifySelects.forEach(sel => {
+    sel.addEventListener("change", () => { markDirty(); saveLocal(false); });
+  });
+  document.getElementById("closeJpgBtn").addEventListener("click", () => {
+    const modal = document.getElementById("jpgModal");
+    modal.classList.remove("show");
+    modal.setAttribute("aria-hidden", "true");
+  });
+
+  restoreState();
+})();
+</script>
+</body>
+</html>
